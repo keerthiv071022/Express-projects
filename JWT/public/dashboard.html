@@ -1,0 +1,103 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+
+<body>
+
+    <h1>Dashboard</h1>
+
+    <h2 id="message">Loading...</h2>
+
+    <p id="userDetails"></p>
+    <p id="userId"></p>
+    <button id="logout">Logout</button>
+    <p id="token"></p>
+
+    <script>
+
+        // Get JWT token from localStorage
+        const token = localStorage.getItem("token");
+
+        // If token doesn't exist, go back to login
+        if (!token) {
+            alert("Please login first")
+            window.location.href = "/index.html";
+        }
+
+        // Send token to protected route
+        async function getDashboard() {
+
+            try {
+
+                const response = await fetch("/dashboard", {
+
+                    method: "GET",
+
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+
+                    document.getElementById("message").innerText =
+                        data.message;
+
+                    document.getElementById("userDetails").innerHTML = `
+                        <h3>User Details</h3>
+                        <p>ID: ${data.user.id}</p>
+                        <p>Username: ${data.user.username}</p>
+                    `;
+                    document.getElementById("token").innerHTML="Token: "+token;
+                } else {
+
+                    document.getElementById("message").innerText =
+                        data.message;
+
+                    // Remove invalid token
+                    localStorage.removeItem("token");
+
+                    // Go to login
+                    window.location.href = "/";
+
+                }
+
+            } catch (error) {
+
+                console.error(error);
+
+                document.getElementById("message").innerText =
+                    "Something went wrong";
+
+            }
+
+        }
+
+        // Call dashboard API
+        getDashboard();
+
+
+        // Logout
+        document.getElementById("logout").addEventListener("click", () => {
+
+            localStorage.removeItem("token");
+
+            window.location.href = "/index.html";
+
+        });
+
+    </script>
+
+</body>
+
+</html>
+

@@ -1,0 +1,56 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+    <head> 
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <title>JWT Login</title> 
+        </head> 
+        <body> 
+    <h1>Login</h1> 
+     <form id="loginForm"> 
+     <label>Username:</label> 
+    <input type="text" id="username" required>
+     <br><br> 
+     <label>Password:</label> 
+    <input type="password" id="password" required> 
+     <br><br> 
+     <button type="submit">Login</button>
+         </form> 
+        <p id="message"></p> 
+         <script> 
+
+         const form=document.getElementById("loginForm")
+    form.addEventListener("submit",async function(e) {
+        e.preventDefault();
+        const username=document.getElementById("username").value;
+         const password=document.getElementById("password").value;
+        const response=await fetch("/login",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                username:username,
+                password:password
+            })
+        })
+        const data=await response.json()
+        if(response.ok){
+            //store JWT
+            localStorage.setItem("token",data.token);
+            console.log("JWT:",data.token);
+            document.getElementById("message").innerText="Login successful";
+            setTimeout(()=>{
+                window.location.href="/dashboard.html";
+            },500)
+            
+            
+        }else{
+    document.getElementById("message").innerText=data.message;
+        }
+    })
+       </script>
+        
+       </body>
+       </html>
+
